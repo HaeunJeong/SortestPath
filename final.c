@@ -50,21 +50,21 @@ int main(int argc, char *argv[])
     Path *dijkstra_path = dijkstra(graph);
     print_shortest_path(dijkstra_path);
 
-    // Path *bellman_ford_path = bellman_ford(graph);
-    // print_shortest_path(bellman_ford_path);
+    Path *bellman_ford_path = bellman_ford(graph);
+    print_shortest_path(bellman_ford_path);
 
-    // Path *floyd_path = floyd_warshall(graph);
-    // print_shortest_path(floyd_path);
+    Path *floyd_path = floyd_warshall(graph);
+    print_shortest_path(floyd_path);
 
-    //free_memory_forPath(dijkstra_path);
-    //free_memory_forPath(bellman_ford_path);
-    //free_memory_forPath(floyd_path);
-    //free_memory_forGraph(graph);
+    // free_memory_forPath(dijkstra_path);
+    // free_memory_forPath(bellman_ford_path);
+    // free_memory_forPath(floyd_path);
+    // free_memory_forGraph(graph);
 
-    //free(dijkstra_path);
-    //free(bellman_ford_path);
-    //free(floyd_path);
-    //free(graph);
+    // free(dijkstra_path);
+    // free(bellman_ford_path);
+    // free(floyd_path);
+    // free(graph);
 
     
     return 0;
@@ -113,7 +113,7 @@ Path *init_all_source(Graph *graph)
             path->pi[i][j] = NIL;
         }
     }
-    printf("init_distance  완료");
+    //printf("init_distance  완료");
 
     return path;
 }

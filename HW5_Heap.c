@@ -144,11 +144,17 @@ void Heap_Update(MinHeap *hp, int name, int value){ //==========================
 
 int Heap_remove(MinHeap *hp){ //아무것도 없으면 -1을 반환한다.
     int ret;
+    Node *temp;
     if (hp->size)
     {
         ret = hp->node[0].nodeIndex; //최 상위에 있는 nodeIndex를 반환함
         hp->node[0] = hp->node[--(hp->size)];                      //맨 하위 노드가 부모자리로 올라온다.
-        hp->node = realloc(hp->node, hp->size * sizeof(Node)); //사이즈를 하나 줄인다.
+        temp = realloc(hp->node, hp->size * sizeof(Node));
+        if(temp != NULL){
+            //hp->node = realloc(hp->node, hp->size * sizeof(Node)); //사이즈를 하나 줄인다.
+            hp->node = temp;
+        }
+        
         Heapify_Child(hp, 0);                                  //부모노드의 제 위치를 찾아준다.
         return ret;
     }
