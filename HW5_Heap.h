@@ -17,7 +17,8 @@ typedef struct
     Node *node;
 } MinHeap;
 
-MinHeap Heap_init();
+//MinHeap Heap_init();
+MinHeap *Heap_init();
 void Heap_Insert(MinHeap *hp, int nodeIndex, int distance);
 int Heap_IsEmpty(MinHeap *hp);
 void swap(Node *n1, Node *n2);

@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include "./HW5_Heap.h"
 
-MinHeap Heap_init()
-{
-    MinHeap hp;
-    hp.size = 0;
+// MinHeap Heap_init()
+// {
+//     MinHeap hp;
+//     hp.size = 0;
+//     return hp;
+// }
+
+MinHeap *Heap_init(){
+    MinHeap *hp = malloc(sizeof(MinHeap));
+    hp->size = 0;
     return hp;
 }
 
@@ -13,7 +19,9 @@ void Heap_Insert(MinHeap *hp, int nodeIndex, int distance){
     //메모리 allocation
     if (hp->size !=0)
     { //이미 노드가 한개 이상 있으면
-        hp->node = (Node*)realloc(hp->node, (hp->size + 1) * sizeof(Node));
+        Node *temp = realloc(hp->node, (hp->size + 1) * sizeof(Node));
+        if(temp!=NULL)
+            hp->node = temp;
     }
     else
     { //노드가 없으면
@@ -37,7 +45,8 @@ void Heap_Insert(MinHeap *hp, int nodeIndex, int distance){
 
 int Heap_IsEmpty(MinHeap *hp){
     if (hp->size == 0){
-         //free(hp->node);
+         free(hp->node);
+         free(hp);
          //================================================================================이부분에서 자꾸, free후에 메모리접근한다고 뜸
         return 1;
     }
@@ -127,8 +136,10 @@ void Heapify_Child(MinHeap *hp, int i)
     }
 }
 
-void Heap_Update(MinHeap *hp, int name, int value){ //=================================속도 개선해야함
+void Heap_Update(MinHeap *hp, int name, int value){
     int i;
+
+    while(i && hp->node[name].distance  )
     for (i = 0; i < hp->size; i++)
     {
         if (hp->node[i].nodeIndex == name)
@@ -159,6 +170,7 @@ int Heap_remove(MinHeap *hp){ //아무것도 없으면 -1을 반환한다.
         return ret;
     }
     else{
+        //free(hp->node);
         return -1;
     }
 }

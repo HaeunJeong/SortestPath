@@ -206,7 +206,9 @@ Path *dijkstra(Graph *graph)
     time_t startTime = 0, endTime = 0;
     startTime = clock();
 
-    MinHeap Q;
+    //MinHeap Q;
+    MinHeap *Q;
+
 
     Path *dijkstra_path = init_all_source(graph);
     dijkstra_path->graph = graph;
@@ -220,14 +222,15 @@ Path *dijkstra(Graph *graph)
         Q = Heap_init(); //큐 초기화
 
         for (int node = 0; node < nodeNum; node++){ //하나씩 노드를 힙 어레이에 집어넣는다.
-            Heap_Insert(&Q, node, dijkstra_path->distance[source][node]);
+            Heap_Insert(Q, node, dijkstra_path->distance[source][node]);
+            printf("띠용?\n");
         }
-        while (!Heap_IsEmpty(&Q)){//큐에서 하나씩 빼준다
-            u = Heap_remove(&Q);//가장 작은값
+        while (!Heap_IsEmpty(Q)){//큐에서 하나씩 빼준다
+            u = Heap_remove(Q);//가장 작은값
             for (int v = 0; v < nodeNum; v++){
                 if (dijkstra_path->graph->w[u][v] != NO){
                     Relax(dijkstra_path, source, u, v);
-                    Heap_Update(&Q, v, dijkstra_path->distance[source][v]); //여기에서 값 업데이트랑, Heapify 를 같이 해준다.
+                    Heap_Update(Q, v, dijkstra_path->distance[source][v]); //여기에서 값 업데이트랑, Heapify 를 같이 해준다.
                     //nodeIndex가 v 인 친구를 찾아서, 바뀐 값으로 업데이트
                 }
             }
@@ -236,7 +239,7 @@ Path *dijkstra(Graph *graph)
             // {
             //     printf("%d -> ", Q.node[i].nodeIndex);
             // }
-            // printf("\n");
+            
             // printf("next remove value is %d\n", Q.node[0].distance);
         }
         //free(Q.node);
