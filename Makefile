@@ -7,3 +7,4 @@ HW5_Graph.o: HW5_Graph.h HW5_Graph.c
 
 clean:
 	rm -f *.o
+	rm hw5

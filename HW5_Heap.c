@@ -2,16 +2,9 @@
 #include <stdlib.h>
 #include "./HW5_Heap.h"
 
-// MinHeap Heap_init()
-// {
-//     MinHeap hp;
-//     hp.size = 0;
-//     return hp;
-// }
-
-MinHeap *Heap_init(){
-    MinHeap *hp = malloc(sizeof(MinHeap));
-    hp->size = 0;
+MinHeap Heap_init(){
+    MinHeap hp;
+    hp.size = 0;
     return hp;
 }
 
@@ -45,8 +38,8 @@ void Heap_Insert(MinHeap *hp, int nodeIndex, int distance){
 
 int Heap_IsEmpty(MinHeap *hp){
     if (hp->size == 0){
-         free(hp->node);
-         free(hp);
+         //free(hp->node);
+         //free(hp);
          //================================================================================이부분에서 자꾸, free후에 메모리접근한다고 뜸
         return 1;
     }
@@ -170,7 +163,7 @@ int Heap_remove(MinHeap *hp){ //아무것도 없으면 -1을 반환한다.
         return ret;
     }
     else{
-        //free(hp->node);
+        free(hp->node);
         return -1;
     }
 }
