@@ -24,6 +24,7 @@ Path *dijkstra(Graph *graph);
 Path *bellman_ford(Graph *graph);
 Path *floyd_warshall(Graph *graph);
 
+int isInS(int* set, int length, int v);
 int min(int a, int b);
 void free_memory_forPath(Path *path);
 void free_memory_forGraph(Graph *graph);
@@ -47,8 +48,8 @@ int main(int argc, char *argv[]){
     Graph *graph = init_Graph(fp);
     nodeNum = graph->nodeNum;
 
-    // Path *dijkstra_path = dijkstra(graph);
-    // print_shortest_path(dijkstra_path);
+    Path *dijkstra_path = dijkstra(graph);
+    print_shortest_path(dijkstra_path, graph);
 
     Path *bellman_ford_path = bellman_ford(graph);
     print_shortest_path(bellman_ford_path, graph);
@@ -56,12 +57,12 @@ int main(int argc, char *argv[]){
     Path *floyd_path = floyd_warshall(graph);
     print_shortest_path(floyd_path, graph);
 
-   // free_memory_forPath(dijkstra_path);
+   free_memory_forPath(dijkstra_path);
     free_memory_forPath(bellman_ford_path);
     free_memory_forPath(floyd_path);
     free_memory_forGraph(graph);
 
-   // free(dijkstra_path);
+     free(dijkstra_path);
     free(bellman_ford_path);
     free(floyd_path);
     free(graph);
@@ -175,30 +176,16 @@ void print_shortest_path(Path *path, Graph *graph)
 {
     int nodeNum = graph->nodeNum;
 
-    printf("\n\t");
-    for(int i=0; i<nodeNum; i++){
-        printf("%s\t", graph->nodes[i]);
-    }
-    //printf("\n");
     for (int source = 0; source < nodeNum; source++)
     {
-        printf("%s\t", graph->nodes[source]);
+        printf("%10s\t", graph->nodes[source]);
         for (int dest = 0; dest < nodeNum; dest++)
         {
             printf("%d\t", path->distance[source][dest]);
         }
         printf("\n");
     }
-
-    for (int source = 0; source < nodeNum; source++)
-    {
-        for (int dest = 0; dest < nodeNum; dest++)
-        {
-            printf("%d\t", path->distance[source][dest]);
-        }
-        printf("\n");
-    }
-    printf("\n*****************************************************************************\n");
+    printf("\n***********************************************************************************************\n");
 }
 
 Path *dijkstra(Graph *graph){
@@ -207,49 +194,59 @@ Path *dijkstra(Graph *graph){
     startTime = clock();
 
     //MinHeap Q;
-    MinHeap Q;
-
+    MinHeap *Q = malloc(sizeof(MinHeap));
 
     Path *dijkstra_path = init_all_source(graph);
     dijkstra_path->graph = graph;
 
     int nodeNum = graph->nodeNum;
     int u, v = 0; //부모 자식, node index
+    int remove_count;
 
-    for (int source = 0; source < nodeNum; source++)
-    { //source 를 바꿔가며 다 돌려서 모든 노드에서의 값을 구할거다.
+    int *s_set = (int*)malloc(sizeof(int)*nodeNum); //뽑힌 노드들 담을 공간
+    for (int source = 0; source < nodeNum; source++){ //source 를 바꿔가며 다 돌려서 모든 노드에서의 값을 구할거다.
+  
+        Q = Heap_init(Q); //큐 초기화
+        memset(s_set,-1,sizeof(int)*nodeNum);
 
-        Q = Heap_init(); //큐 초기화
+        remove_count=0;
 
         for (int node = 0; node < nodeNum; node++){ //하나씩 노드를 힙 어레이에 집어넣는다.
-            Heap_Insert(&Q, node, dijkstra_path->distance[source][node]);
+        //printf("distnace[%d][%d] == %d\n", source,node,dijkstra_path->distance[source][node]);
+            Heap_Insert_(Q, node, dijkstra_path->distance[source][node]);
         }
-        while (!Heap_IsEmpty(&Q)){//큐에서 하나씩 빼준다
-            u = Heap_remove(&Q);//가장 작은값
+        while (!Heap_IsEmpty(Q)){//큐에서 하나씩 빼준다
+            u = Heap_remove(Q);//가장 작은값
+            s_set[remove_count] = u;
+            remove_count++;
             
             for (int v = 0; v < nodeNum; v++){
-                if (dijkstra_path->graph->w[u][v] != NO){
-                    Relax(dijkstra_path, source, u, v);
-                    Heap_Update(&Q, v, dijkstra_path->distance[source][v]); //여기에서 값 업데이트랑, Heapify 를 같이 해준다.
-                    //nodeIndex가 v 인 친구를 찾아서, 바뀐 값으로 업데이트
+                if (dijkstra_path->graph->w[u][v] != NO){//인접한 것이 있으면 
+                    if(!isInS(s_set, nodeNum, v)){//&& 그것이 q에서 뽑히지 않았으면
+                        Relax(dijkstra_path, source, u, v);
+                        Heap_Update(Q, v, dijkstra_path->distance[source][v]); //여기에서 값 업데이트랑, Heapify 를 같이 해준다.
+                    }
                 }
             }
-            // printf("after %d removed, remain heap is ", u); //u는 nodeName
-            // for (int i = 0; i < Q->size; i++)
-            // {
-            //     printf("%d -> ", Q->node[i].nodeIndex);
-            // }
-            // printf("next remove value is %d\n", Q->node[0].distance);
         }
-        free(&Q);
-        //printf("heap is empty\n");
     }
+     free(s_set);
+     free(Q);
 
     endTime = clock();
 
     printf("It took %f seconds to compute shortest path between cities with Dijkstra's algorithm as follows.\n", (float)endTime - startTime);
-
     return dijkstra_path;
+}
+int isInS(int* set, int length, int v){
+    int i;
+   for(i=0; i<length; i++){
+        if(set[i]==v){
+            //printf("%d는 이미있다!!\n", v);
+            return 1;
+        }
+    }   
+    return 0;
 }
 void Relax(Path *path, int source, int u, int v)
 {

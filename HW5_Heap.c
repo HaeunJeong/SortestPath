@@ -2,48 +2,68 @@
 #include <stdlib.h>
 #include "./HW5_Heap.h"
 
-MinHeap Heap_init(){
-    MinHeap hp;
-    hp.size = 0;
+MinHeap* Heap_init(MinHeap* hp){
+    //MinHeap *hp;
+    hp->size = 0;
     return hp;
 }
 
-void Heap_Insert(MinHeap *hp, int nodeIndex, int distance){
-    //메모리 allocation
-    if (hp->size !=0)
-    { //이미 노드가 한개 이상 있으면
-        Node *temp = realloc(hp->node, (hp->size + 1) * sizeof(Node));
-        if(temp!=NULL)
-            hp->node = temp;
-    }
-    else
-    { //노드가 없으면
-        hp->node = (Node*)malloc(sizeof(Node));
+
+void Heap_Insert_(MinHeap *hp, int index, int distance) {//distance만 있다고 생각해보자
+    if(hp->size) {
+        hp->node = realloc(hp->node, (hp->size + 1) * sizeof(Node)) ;
+    } else {
+        hp->node = malloc(sizeof(Node)) ;
     }
 
-    //집어넣을 Node를 하나 만들어서 값을 할당
-    Node new;
-    new.nodeIndex = nodeIndex;
-    new.distance = distance;
+    Node node ;
+    node.distance = distance;
+    node.nodeIndex = index;
 
-    hp->size = hp->size + 1; //사이즈를 하나 늘려주고
-    int i = hp->size -1; //마지막 자리에
-    while (i && new.distance < hp->node[PARENT(i)].distance)
-    { //부모보다 작으면, 부모로 올려주기
-        hp->node[i] = hp->node[PARENT(i)];
-        i = PARENT(i);
+    int i = (hp->size)++ ;
+    while(i && node.distance < hp->node[PARENT(i)].distance) {
+        hp->node[i] = hp->node[PARENT(i)] ;
+        i = PARENT(i) ;
     }
-    hp->node[i] = new;
+    hp->node[i] = node;
 }
+
+// void Heap_Insert(MinHeap *hp, int index, int distance){
+
+//     int heapsize = hp->size;
+//     //메모리 allocation
+//     if (hp->size !=0)
+//     { //이미 노드가 한개 이상 있으면
+//         Node *temp = realloc(hp->node, heapsize * sizeof(hp->node));
+//         if(temp!=NULL)
+//             hp->node = temp;
+//     }
+//     else{ //노드가 없으면
+//         hp->node = (Node*)malloc(sizeof(hp->node));
+//     }
+
+//     hp->size = heapsize+ 1; //사이즈를 하나 늘려주고
+//     int i = heapsize;//i는 마지막 leaf의 위치에 있다.
+
+//     hp->node[i].distance = distance;
+//     hp->node[i].nodeIndex = index;
+
+//     printf("nodeIndex가 %d 이고, distance가 %d 인 친구가 %d자리에 일단 안착\n", hp->node[i].nodeIndex, hp->node[i].distance,i);
+    
+//     while ( i && (distance < hp->node[PARENT(i)].distance)){ //부모보다 작으면, 부모로 올려주기
+//             printf("원래꺼   ");
+//             PrintHeap(hp);
+//             swap(&(hp->node[i]), &(hp->node[PARENT(i)]));
+//             i = PARENT(i);
+//             printf("부모랑 바꼈냐??   ");
+//             PrintHeap(hp);
+//     }
+// }
 
 int Heap_IsEmpty(MinHeap *hp){
     if (hp->size == 0){
-         //free(hp->node);
-         //free(hp);
-         //================================================================================이부분에서 자꾸, free후에 메모리접근한다고 뜸
         return 1;
     }
-        
     else
         return 0;
 }
@@ -62,7 +82,7 @@ int IsLeftNode(int index)
 }
 int IsRightNode(int index)
 {
-    if (index % 2 == 0)
+    if (index!=0 && index % 2 == 0)
         return 1;
     else
         return 0;
@@ -77,32 +97,36 @@ void PrintHeap(MinHeap *hp)
 }
 
 //부모로 올라가면서 heapify하는 것임
-void Heapify_Parent(MinHeap *hp, int i)
-{
-    //3. 부모로 올라갈 수 있는데까지 올라가기
+void Heapify_Parent(MinHeap *hp, int i){
+
+    int currentIndex = i;
+    int heapsize = hp->size;
     while (1)
     {
-        if (i == 0 || hp->node[PARENT(i)].distance < hp->node[i].distance) //부모보다 크냐? 또는 루트노드냐??-> 그럼 종료해
+        //PrintHeap(hp);
+        if (currentIndex == 0 || hp->node[PARENT(currentIndex)].distance <= hp->node[currentIndex].distance) //부모보다 크냐? 또는 루트노드냐??-> 그럼 종료해
         {
-            if (i != 0 && IsLeftNode(i) && (hp->node[i].distance > hp->node[i + 1].distance))
-            {
-                swap(&hp->node[i], &hp->node[i + 1]); //형제끼리 바꾸고
-                //printf("오른쪽 형제와 스왑\t");
-                //PrintHeap(hp);
-            }
-            else if (i != 0 && IsRightNode(i) && (hp->node[i].distance < hp->node[i - 1].distance))
-            {
-                swap(&hp->node[i], &hp->node[i - 1]); //형제끼리 바꾸고
-                //printf("왼쪽 형제와 스왑\t");
-                //PrintHeap(hp);
-            }
+            // //형제가 있는지부터 봐야함. 왼쪽노드인데, 오른쪽 형제가 없을수도 있잖아.
+            // if (IsLeftNode(currentIndex) && currentIndex!=heapsize-1 && (hp->node[currentIndex].distance > hp->node[currentIndex + 1].distance))
+            // {//왼쪽노드 && 마지막노드 아니고 && 오른쪽보다 크면 
+            //     swap(&(hp->node[currentIndex]), &(hp->node[currentIndex + 1])); //형제끼리 바꾸고
+            //     printf("오른쪽 형제와 스왑\t");
+            //     PrintHeap(hp);
+            // }
+            // else if (IsRightNode(currentIndex) && (hp->node[currentIndex].distance < hp->node[currentIndex - 1].distance))
+            // {
+            //     swap(&(hp->node[currentIndex]), &(hp->node[currentIndex - 1])); //형제끼리 바꾸고
+            //     printf("왼쪽 형제와 스왑\t");
+            //     PrintHeap(hp);
+            // }
+            Heapify_Child(hp,currentIndex);
 
             break;
         }
-        else // 부모노드와 교환
+        else// 부모노드와 교환
         {
-            swap(&hp->node[PARENT(i)], &hp->node[i]);
-            i = PARENT(i);
+            swap(&(hp->node[PARENT(currentIndex)]), &(hp->node[currentIndex]));
+            currentIndex = PARENT(currentIndex);
             //printf("부모와 스왑\t");
             //PrintHeap(hp);
         }
@@ -110,29 +134,31 @@ void Heapify_Parent(MinHeap *hp, int i)
 }
 
 //자식들만 보면서, heapify 하는 함수
-void Heapify_Child(MinHeap *hp, int i)
-{
-    if (hp->node[LCHILD(i)].distance < hp->node[i].distance)
-    { // 정상이 아님
-        if (hp->node[RCHILD(i)].distance < hp->node[i].distance)
-        {
-            swap(&hp->node[RCHILD(i)], &hp->node[i]);
-            Heapify_Child(hp, RCHILD(i));
-            //R이랑 스왑
+void Heapify_Child(MinHeap *hp, int i){   
+    int leaf = hp->size -1;
+    if(LCHILD(i)<leaf){
+
+        if (hp->node[LCHILD(i)].distance < hp->node[i].distance)
+        { // 정상이 아님
+            if (hp->node[RCHILD(i)].distance < hp->node[i].distance)
+            {
+                swap(&(hp->node[RCHILD(i)]), &(hp->node[i]));
+                Heapify_Child(hp, RCHILD(i));
+                //R이랑 스왑
+            }
+            else
+            {
+                swap(&hp->node[LCHILD(i)], &hp->node[i]);
+                Heapify_Child(hp, LCHILD(i));
+                //L이랑 스왑
+            }
         }
-        else if (hp->node[RCHILD(i)].distance > hp->node[i].distance)
-        {
-            swap(&hp->node[LCHILD(i)], &hp->node[i]);
-            Heapify_Child(hp, LCHILD(i));
-            //L이랑 스왑
-        }
-    }
+    }  
 }
 
 void Heap_Update(MinHeap *hp, int name, int value){
-    int i;
 
-    while(i && hp->node[name].distance  )
+    int i;
     for (i = 0; i < hp->size; i++)
     {
         if (hp->node[i].nodeIndex == name)
@@ -143,24 +169,33 @@ void Heap_Update(MinHeap *hp, int name, int value){
             break;
         }
     }
-    
+    // if(i==hp->size){
+    //     printf("해당 노드가 없어요\n");
+    // }
 }
 
 int Heap_remove(MinHeap *hp){ //아무것도 없으면 -1을 반환한다.
-    int ret;
+    int removed;
+    int leaf = hp->size -1;
     Node *temp;
     if (hp->size)
     {
-        ret = hp->node[0].nodeIndex; //최 상위에 있는 nodeIndex를 반환함
-        hp->node[0] = hp->node[--(hp->size)];                      //맨 하위 노드가 부모자리로 올라온다.
-        temp = realloc(hp->node, hp->size * sizeof(Node));
+        removed = hp->node[0].nodeIndex; //최 상위에 있는 nodeIndex를 반환함
+
+        hp->node[0].distance = hp->node[leaf].distance;
+        hp->node[0].nodeIndex = hp->node[leaf].nodeIndex;
+        //printf("이제 최상위노드는 %d, 값은 %d\n",  hp->node[0].nodeIndex ,hp->node[0].distance);
+        //PrintHeap(hp);
+        hp->size -= 1;
+
+        temp = realloc(hp->node, hp->size * sizeof(hp->node));
         if(temp != NULL){
             //hp->node = realloc(hp->node, hp->size * sizeof(Node)); //사이즈를 하나 줄인다.
             hp->node = temp;
         }
         
         Heapify_Child(hp, 0);                                  //부모노드의 제 위치를 찾아준다.
-        return ret;
+        return removed;
     }
     else{
         free(hp->node);

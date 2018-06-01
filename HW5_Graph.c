@@ -25,7 +25,7 @@ char *trim(char *s)
 Graph *init_Graph(FILE *fp)
 {
 
-    Graph *graph = (Graph *)malloc(sizeof(Graph *)); //그래프 메모리 동적 할당
+    Graph *graph = (Graph *)malloc(sizeof(Graph)); //그래프 메모리 동적 할당
     //Edge edges[100];//==============================================================
     //graph->edges = (Edge*)malloc(sizeof(Edge));
 
@@ -49,7 +49,7 @@ Graph *init_Graph(FILE *fp)
     graph->nodeNum = nodeNum;
 
     //char **Node = (char**)malloc(sizeof(node)*nodeNum);
-    graph->nodes = (char **)malloc(sizeof(node) * nodeNum);
+    graph->nodes = (char **)malloc(sizeof(char*) * nodeNum);
 
     ptr = strtok(copy, "\t "); //탭과 스페이스를 기준으로 자른다.
 

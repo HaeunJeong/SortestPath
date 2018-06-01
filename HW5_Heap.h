@@ -13,13 +13,14 @@ typedef struct
 
 typedef struct
 {
-    int size;
-    Node *node;
+int size;
+Node *node;
 } MinHeap;
 
-MinHeap Heap_init();
-//MinHeap *Heap_init();
-void Heap_Insert(MinHeap *hp, int nodeIndex, int distance);
+//MinHeap Heap_init();
+MinHeap *Heap_init(MinHeap*);
+//void Heap_Insert(MinHeap *hp, int nodeIndex, int distance);
+void Heap_Insert_(MinHeap *hp, int nodeIndex, int distance);
 int Heap_IsEmpty(MinHeap *hp);
 void swap(Node *n1, Node *n2);
 int IsLeftNode(int index);
