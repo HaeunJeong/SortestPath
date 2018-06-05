@@ -11,7 +11,9 @@ MinHeap* Heap_init(MinHeap* hp){
 
 void Heap_Insert_(MinHeap *hp, int index, int distance) {//distance만 있다고 생각해보자
     if(hp->size) {
-        hp->node = realloc(hp->node, (hp->size + 1) * sizeof(Node)) ;
+        Node *temp = realloc(hp->node, (hp->size + 1) * sizeof(Node));
+        if(temp != NULL)
+            hp->node = temp;
     } else {
         hp->node = malloc(sizeof(Node)) ;
     }
@@ -20,45 +22,14 @@ void Heap_Insert_(MinHeap *hp, int index, int distance) {//distance만 있다고
     node.distance = distance;
     node.nodeIndex = index;
 
-    int i = (hp->size)++ ;
+    int i = hp->size;
+    hp->size += 1;
     while(i && node.distance < hp->node[PARENT(i)].distance) {
         hp->node[i] = hp->node[PARENT(i)] ;
         i = PARENT(i) ;
     }
     hp->node[i] = node;
 }
-
-// void Heap_Insert(MinHeap *hp, int index, int distance){
-
-//     int heapsize = hp->size;
-//     //메모리 allocation
-//     if (hp->size !=0)
-//     { //이미 노드가 한개 이상 있으면
-//         Node *temp = realloc(hp->node, heapsize * sizeof(hp->node));
-//         if(temp!=NULL)
-//             hp->node = temp;
-//     }
-//     else{ //노드가 없으면
-//         hp->node = (Node*)malloc(sizeof(hp->node));
-//     }
-
-//     hp->size = heapsize+ 1; //사이즈를 하나 늘려주고
-//     int i = heapsize;//i는 마지막 leaf의 위치에 있다.
-
-//     hp->node[i].distance = distance;
-//     hp->node[i].nodeIndex = index;
-
-//     printf("nodeIndex가 %d 이고, distance가 %d 인 친구가 %d자리에 일단 안착\n", hp->node[i].nodeIndex, hp->node[i].distance,i);
-    
-//     while ( i && (distance < hp->node[PARENT(i)].distance)){ //부모보다 작으면, 부모로 올려주기
-//             printf("원래꺼   ");
-//             PrintHeap(hp);
-//             swap(&(hp->node[i]), &(hp->node[PARENT(i)]));
-//             i = PARENT(i);
-//             printf("부모랑 바꼈냐??   ");
-//             PrintHeap(hp);
-//     }
-// }
 
 int Heap_IsEmpty(MinHeap *hp){
     if (hp->size == 0){
@@ -188,7 +159,7 @@ int Heap_remove(MinHeap *hp){ //아무것도 없으면 -1을 반환한다.
         //PrintHeap(hp);
         hp->size -= 1;
 
-        temp = realloc(hp->node, hp->size * sizeof(hp->node));
+        temp = realloc(hp->node, hp->size * sizeof(Node));
         if(temp != NULL){
             //hp->node = realloc(hp->node, hp->size * sizeof(Node)); //사이즈를 하나 줄인다.
             hp->node = temp;

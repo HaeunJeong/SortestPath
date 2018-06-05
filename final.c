@@ -62,11 +62,6 @@ int main(int argc, char *argv[]){
     free_memory_forPath(floyd_path);
     free_memory_forGraph(graph);
 
-     free(dijkstra_path);
-    free(bellman_ford_path);
-    free(floyd_path);
-    free(graph);
-
     
     return 0;
 }
@@ -93,28 +88,26 @@ Path *init_all_source(Graph *graph)
                 continue;
             }
             path->distance[i][j] = INF;
-            //printf("source: %d, dest: %d, value: %d\n", i,j,path->distance[i][j]);
         }
     }
 
-    //pi[source][nodes]를 NIL로 초기화
-    path->pi = (int **)malloc(sizeof(int **) * nodeNum); //row길이. 총 몇개 노드를 수용할건지
-    for (int i = 0; i < nodeNum; i++)
-    {
-        path->pi[i] = (int *)malloc(sizeof(int *)); //distance[source_index][]의 값의 크기
-        memset(path->pi[i], 0, sizeof(int));        //초기화
+    // //pi[source][nodes]를 NIL로 초기화
+    // path->pi = (int **)malloc(sizeof(int **) * nodeNum); //row길이. 총 몇개 노드를 수용할건지
+    // for (int i = 0; i < nodeNum; i++)
+    // {
+    //     path->pi[i] = (int *)malloc(sizeof(int *)); //distance[source_index][]의 값의 크기
+    //     memset(path->pi[i], 0, sizeof(int));        //초기화
 
-        for (int j = 0; j < nodeNum; j++)
-        {
-            if (i == j)
-            {
-                path->pi[i][j] = NO; //pi[s]=0의 효과를 가짐
-                continue;
-            }
-            path->pi[i][j] = NIL;
-        }
-    }
-    //printf("init_distance  완료");
+    //     for (int j = 0; j < nodeNum; j++)
+    //     {
+    //         if (i == j)
+    //         {
+    //             path->pi[i][j] = NO; //pi[s]=0의 효과를 가짐
+    //             continue;
+    //         }
+    //         path->pi[i][j] = NIL;
+    //     }
+    // }
 
     return path;
 }
@@ -150,28 +143,27 @@ Path *init_for_floyd(Graph *graph)
         }
     }
 
-    //pi[source][nodes]를 NIL로 초기화
-    path->pi = (int **)malloc(sizeof(int **) * nodeNum); //row길이. 총 몇개 노드를 수용할건지
-    for (int i = 0; i < nodeNum; i++)
-    {
-        path->pi[i] = (int *)malloc(sizeof(int *)); //distance[source_index][]의 값의 크기
-        memset(path->pi[i], 0, sizeof(int));        //초기화
+    // //pi[source][nodes]를 NIL로 초기화
+    // path->pi = (int **)malloc(sizeof(int **) * nodeNum); //row길이. 총 몇개 노드를 수용할건지
+    // for (int i = 0; i < nodeNum; i++)
+    // {
+    //     path->pi[i] = (int *)malloc(sizeof(int *)); //distance[source_index][]의 값의 크기
+    //     memset(path->pi[i], 0, sizeof(int));        //초기화
 
-        for (int j = 0; j < nodeNum; j++)
-        {
-            if (i == j)
-            {
-                path->pi[i][j] = NO; //pi[s]=0의 효과를 가짐
-                continue;
-            }
-            path->pi[i][j] = NIL;
-        }
-    }
+    //     for (int j = 0; j < nodeNum; j++)
+    //     {
+    //         if (i == j)
+    //         {
+    //             path->pi[i][j] = NO; //pi[s]=0의 효과를 가짐
+    //             continue;
+    //         }
+    //         path->pi[i][j] = NIL;
+    //     }
+    // }
 
     return path;
 }
 
-//void print_shortest_path(Path *path)
 void print_shortest_path(Path *path, Graph *graph)
 {
     int nodeNum = graph->nodeNum;
@@ -199,7 +191,7 @@ Path *dijkstra(Graph *graph){
     Path *dijkstra_path = init_all_source(graph);
     dijkstra_path->graph = graph;
 
-    int nodeNum = graph->nodeNum;
+    int nodeNum = dijkstra_path->graph->nodeNum;
     int u, v = 0; //부모 자식, node index
     int remove_count;
 
@@ -250,14 +242,10 @@ int isInS(int* set, int length, int v){
 }
 void Relax(Path *path, int source, int u, int v)
 {
-    //printf("u: %d, v: %d\n",u,v);
-
     if (path->distance[source][v] > (path->distance[source][u]) + (path->graph->w[u][v]))
     {
-        //printf("u: %d, v: %d \t %d > %d \t", u, v,path->distance[source][v], (path->distance[source][u]) + (path->graph->w[u][v]));
         path->distance[source][v] = path->distance[source][u] + path->graph->w[u][v];
-        path->pi[source][v] = u;
-        //printf(" -> %d \n", path->distance[source][v]);
+        //path->pi[source][v] = u;
     }
 }
 
@@ -286,7 +274,6 @@ Path *bellman_ford(Graph *graph)
                 v = bellman_ford_path->graph->edges[edge].node_b;
                 Relax(bellman_ford_path, source, u, v);
                 Relax(bellman_ford_path, source, v, u); //============이렇게 Relax두번 해서 해결해도 될런지 모르겠다...
-                                                        //printf("u: %d, v: %d \t %d > %d \t", u, v,bellman_ford_path->distance[source][v], (bellman_ford_path->distance[source][u]) + (bellman_ford_path->graph->w[u][v]));
             }
         }
     }
@@ -347,11 +334,11 @@ void free_memory_forPath(Path *path)
     for (int i = 0; i < nodeNum; i++)
     {
         free(path->distance[i]);
-        free(path->pi[i]);
+        //free(path->pi[i]);
     }
     free(path->distance);
     free(path->pi);
-    //free(path);
+    free(path);
 }
 
 void free_memory_forGraph(Graph *graph){
@@ -365,5 +352,5 @@ void free_memory_forGraph(Graph *graph){
 
     free(graph->w);
     free(graph->nodes);
-    //free(graph);
+    free(graph);
 }
